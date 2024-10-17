@@ -52,10 +52,15 @@ class MainActivity : ComponentActivity() {
 
                         GreetingImage(
                             modifier = Modifier
-                                .padding(25.dp)
                         )
-
-                        val info = listOf("Driver Info", "Main Battery", "Supplemental", "Array 1", "Array 2", "Array 3", "Motor")
+                        val driverInfo = mutableListOf("Average Speed: 0 m/s", "Average Temperature: 0°F")
+                        val mainBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
+                        val supBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
+                        val arr1Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
+                        val arr2Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
+                        val arr3Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
+                        val motorInfo = mutableListOf("Power: 0 V", "Temperature: 0°F")
+                        val info = mutableMapOf("Driver Info" to driverInfo, "Main Battery" to mainBatteryInfo, "Supplemental" to supBatteryInfo, "Array 1" to arr1Info, "Array 2" to arr2Info, "Array 3" to arr3Info, "Motor" to motorInfo);
                         DataGrid(
                             data = info
                         )
@@ -67,11 +72,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LazyGridItemScope.DataPoint(name: String, modifier: Modifier = Modifier) {
+fun LazyGridItemScope.DataPoint(name: String, data: List<String>, modifier: Modifier = Modifier) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Surface at the top
         Surface(color = Color.Green, modifier = Modifier.padding(10.dp)) {
-            Box(modifier = Modifier.fillMaxSize().padding(10.dp)) { // This padding changes size of box!
+            Box(
+                modifier = Modifier.fillMaxSize().padding(10.dp)
+            ) { // This padding changes size of box!
                 Text(
                     text = name,
                     modifier = Modifier.align(Alignment.Center)
@@ -80,11 +87,14 @@ fun LazyGridItemScope.DataPoint(name: String, modifier: Modifier = Modifier) {
         }
 
         // Box with "Data Point" below the Surface
-        Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-            Text(
-                text = "Data Point",
-                modifier = Modifier.align(Alignment.Center)
-            )
+        for (value in data) {
+            Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+                Text(
+                    text = value,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
         }
     }
 }
@@ -92,17 +102,19 @@ fun LazyGridItemScope.DataPoint(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun DataGrid(
     modifier : Modifier = Modifier,
-    data : List<String>
+    data : Map<String, List<String>>
 ) {
     // columns = GridCells.Adaptive(dp size of each cell) or GridCells.Fixed(fixed number of cells)
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Fixed(3),
     ) {
-        items(data.size) { d ->
+        items(data.entries.size) { d ->
+            val entry = data.entries.elementAt(d)
             DataPoint(
                 modifier = Modifier.aspectRatio(1f),
-                name = data[d]
+                name = entry.key,
+                data = entry.value
             )
         }
     }
