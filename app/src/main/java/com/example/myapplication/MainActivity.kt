@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                                 .padding(25.dp)
                         )
 
-                        val info = listOf("1", "2", "3", "4", "5")
+                        val info = listOf("Driver Info", "Main Battery", "Supplemental", "Array 1", "Array 2", "Array 3", "Motor")
                         DataGrid(
                             data = info
                         )
@@ -97,7 +97,7 @@ fun DataGrid(
     // columns = GridCells.Adaptive(dp size of each cell) or GridCells.Fixed(fixed number of cells)
     LazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Fixed(5),
+        columns = GridCells.Fixed(3),
     ) {
         items(data.size) { d ->
             DataPoint(
@@ -113,7 +113,6 @@ fun DataGrid(
 @Composable
 fun GreetingPreview() {
     MyApplicationTheme {
-
 
     }
 }
