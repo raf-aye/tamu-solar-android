@@ -2,6 +2,7 @@ package com.example.myapplication
 
 
 import android.os.Bundle
+import androidx.compose.ui.Alignment
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,18 +11,23 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,8 +36,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +47,9 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.github.anastr.speedometer.PointerSpeedometer
 import com.github.anastr.speedometer.SpeedView
 import com.github.anastr.speedometer.TubeSpeedometer
+import com.github.anastr.speedometer.components.text.SpeedText
+import kotlinx.collections.immutable.immutableListOf
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.random.Random
 
 
@@ -56,11 +65,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        // TAMU Solar Logo positioned at top left
-
-                        GreetingImage(
-                            modifier = Modifier
-                        )
+                        /*
                         val driverInfo = mutableListOf("Average Speed: 0 m/s", "Average Temperature: 0°F")
                         val mainBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
                         val supBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
@@ -73,6 +78,7 @@ class MainActivity : ComponentActivity() {
                             data = info
                         )
 
+                         */
                     }
                     var speed by remember { mutableStateOf(0f) }
                     val currentSpeed by animateFloatAsState(
@@ -85,9 +91,15 @@ class MainActivity : ComponentActivity() {
                             .padding(12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
+
                         PointerSpeedometer(
-                            modifier = Modifier.size(250.dp),
+                            modifier = Modifier.size(150.dp),
                             speed = currentSpeed,
+                            backgroundCircleColor = Color(80, 0, 0),
+                            barColor = Color(255, 255, 255),
+                            maxSpeed = 75f,
+
+                            unit = "mph"
                         )
                         Button(
                             onClick = {
@@ -97,13 +109,44 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Text("Random speed")
                         }
+
+                        Box(
+                            modifier = Modifier
+                                .height(50.dp)
+                                .width(60.dp) // Adjust width to account for battery terminal
+                        ) {
+
+                            // Battery terminal
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .width(20.dp) // Adjust terminal width as needed
+                                    .height(13.5.dp) // Make it smaller than the main body for a terminal look
+                                    .background(Color.Gray)
+                                    .align(Alignment.CenterStart)
+
+                                //.padding(end = 4.dp)
+                            )
+
+                            // Battery body
+                            LinearProgressIndicator(
+                                progress = 0.2f,
+                                modifier = Modifier
+                                    .height(25.dp)
+                                    .width(50.dp)
+                                    //.clip(RoundedCornerShape(16.dp))
+                                    .align(Alignment.CenterEnd)
+                            )
+
+
+                        }
+                    }
                     }
                 }
 
             }
         }
     }
-}
 
 @Composable
 fun LazyGridItemScope.DataPoint(name: String, data: List<String>, modifier: Modifier = Modifier) {
