@@ -42,6 +42,8 @@ import com.github.anastr.speedometer.PointerSpeedometer
 import com.github.anastr.speedometer.SpeedView
 import com.github.anastr.speedometer.TubeSpeedometer
 import kotlin.random.Random
+import android.widget.SeekBar
+import androidx.core.content.ContextCompat
 
 
 class MainActivity : ComponentActivity() {
@@ -74,30 +76,6 @@ class MainActivity : ComponentActivity() {
                         )
 
                     }
-                    var speed by remember { mutableStateOf(0f) }
-                    val currentSpeed by animateFloatAsState(
-                        targetValue = speed,
-                        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        PointerSpeedometer(
-                            modifier = Modifier.size(250.dp),
-                            speed = currentSpeed,
-                        )
-                        Button(
-                            onClick = {
-                                // Change speed to start the animation
-                                speed = Random.nextFloat() * 100
-                            },
-                        ) {
-                            Text("Random speed")
-                        }
-                    }
                 }
 
             }
@@ -106,36 +84,138 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LazyGridItemScope.DataPoint(name: String, data: List<String>, modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Surface at the top
-        Surface(color = Color.Green, modifier = Modifier.padding(10.dp)) {
+fun LazyGridItemScope.PointerSpeedometer(name: String, data: List<String>, modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(10.dp)
-            ) { // This padding changes size of box!
+                    .padding(bottom = 8.dp)
+                    .align(Alignment.CenterHorizontally)
+            ) {
                 Text(
                     text = name,
-                    modifier = Modifier.align(Alignment.Center)
+                    fontSize = 16.sp,
+                    color = Color.Black,
                 )
             }
-        }
+        if (name == "Driver Info") {
+            var speed by remember { mutableStateOf(0f) }
+            val currentSpeed by animateFloatAsState(
+                targetValue = speed,
+                animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+            )
+            Text(
+                text = "Average Speed",
+                fontSize = 12.sp
+            )
+            PointerSpeedometer(
+                modifier = Modifier.size(250.dp),
+                speed = currentSpeed,
+            )
+            Button(
+                onClick = {
+                    // Change speed to start the animation
+                    speed = Random.nextFloat() * 100
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(4.dp) // Reduce padding
+                    .size(120.dp, 40.dp) // Adjust size (width x height)
+            ) {
+                Text("Update speed")
+            }
 
-        // Box with "Data Point" below the Surface
-        for (value in data) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)) {
+            // temperature
+            var temperature by remember { mutableStateOf(0f) }
+            val currentTemperature by animateFloatAsState(
+                targetValue = temperature,
+                animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+            )
+            Text(
+                text = "Average Temperature",
+                fontSize = 12.sp
+            )
+            TubeSpeedometer(
+                modifier = Modifier.size(120.dp),
+                speed = currentTemperature,
+                unit = "°F"
+            )
+            Button(
+                onClick = {
+                    // Change speed to start the animation
+                    temperature = Random.nextFloat() * 120 - 10
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(4.dp) // Reduce padding
+                    .size(120.dp, 40.dp) // Adjust size (width x height)
+            ) {
+                Text("Update temp")
+            }
+
+        } else if (name == "Motor") {
+                var temperature by remember { mutableStateOf(0f) }
+                val currentTemperature by animateFloatAsState(
+                    targetValue = temperature,
+                    animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+                )
                 Text(
-                    text = value,
-                    modifier = Modifier.align(Alignment.Center)
+                    text = "Average Temperature",
+                    fontSize = 12.sp
                 )
+                TubeSpeedometer(
+                    modifier = Modifier.size(120.dp),
+                    speed = currentTemperature,
+                    unit = "°F"
+                )
+                Button(
+                    onClick = {
+                        // Change speed to start the animation
+                        temperature = Random.nextFloat() * 120 - 10
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(4.dp) // Reduce padding
+                        .size(120.dp, 40.dp) // Adjust size (width x height)
+                ) {
+                    Text("Update temp")
+                }
+            Text(
+                text = "Current and Power",
+                fontSize = 12.sp
+            )
+        } else {
+            data.forEach { metric: String ->
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 4.dp)
+                ) {
+                    if (metric.contains("Voltage")) {
+                        val image = painterResource(id = R.drawable.voltage_image)
+                        Image(
+                            painter = image,
+                            contentDescription = "Voltage Icon",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .padding(end = 8.dp)
+                        )
+                    }
+                    Text(
+                        text = metric,
+                        fontSize = 12.sp
+                    )
+                }
             }
-
         }
     }
 }
+
+
 
 @Composable
 fun DataGrid(
@@ -149,7 +229,7 @@ fun DataGrid(
     ) {
         items(data.entries.size) { d ->
             val entry = data.entries.elementAt(d)
-            DataPoint(
+            PointerSpeedometer(
                 modifier = Modifier.aspectRatio(1f),
                 name = entry.key,
                 data = entry.value
@@ -185,4 +265,3 @@ fun GreetingImage(modifier: Modifier = Modifier) {
         )
     }
 }
-
