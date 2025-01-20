@@ -4,8 +4,8 @@ package com.example.myapplication
 
 /*
 TO DO:
-        -- change background color to dark
-        -- change sensor displays to lighter colors
+        -- need battery gauges
+        -- temps are still black, problem with library
         -- design UI on ipad
 
  */
@@ -72,206 +72,67 @@ import androidx.compose.foundation.layout.*
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color(25, 25, 25)) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                            .background(Color(25, 25, 25))
-                            //.verticalScroll(rememberScrollState())
-                    ) {
-                         //TAMU Solar Logo positioned at top left
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(80, 0, 0))
-                                .padding(16.dp)
-                                //.align(Alignment.TopCenter)
-                        ) {
-                            GreetingImage(
-                                modifier = Modifier
-                            )
-                        }
-                        val driverInfo = mutableListOf("Average Speed: 0 m/s", "Average Temperature: 0°F")
-                        val mainBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
-                        val supBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
-                        val arr1Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
-                        val arr2Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
-                        val arr3Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
-                        val motorInfo = mutableListOf("Power: 0 V", "Temperature: 0°F")
-                        val info = mutableMapOf("Driver Info" to driverInfo, "Main Battery" to mainBatteryInfo, "Supplemental" to supBatteryInfo, "Array 1" to arr1Info, "Array 2" to arr2Info, "Array 3" to arr3Info, "Motor" to motorInfo);
-                        DataGrid(
-                            data = info
-                        )
-
-                    }
-
-                }
-
+                MainScreen()
             }
         }
     }
 }
 
 @Composable
-fun LazyGridItemScope.PointerSpeedometer(name: String, data: List<String>, modifier: Modifier = Modifier) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+fun MainScreen() {
+    val driverInfo = mutableListOf("Average Speed: 0 m/s", "Average Temperature: 0°F")
+    val mainBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
+    val supBatteryInfo = mutableListOf("Voltage: 0 V", "Current: 0 A")
+    val arr1Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
+    val arr2Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
+    val arr3Info = mutableListOf("Voltage: 0 V", "Current: 0 A", "Power: 0 W")
+    val motorInfo = mutableListOf("Power: 0 W", "Temperature: 0°F", "Current: 0 A")
+
+    val info = mutableMapOf(
+        "Driver Info" to driverInfo,
+        "Main Battery" to mainBatteryInfo,
+        "Supplemental" to supBatteryInfo,
+        "Array 1" to arr1Info,
+        "Array 2" to arr2Info,
+        "Array 3" to arr3Info,
+        "Motor" to motorInfo
+    )
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color(25, 25, 25)
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(Color(25, 25, 25))
         ) {
+            // TAMU Solar Logo at the top left
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.Center
+                    .background(Color(80, 0, 0))
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = name,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                )
+                GreetingImage()
             }
 
-        if (name == "Driver Info") {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.Center
+            // Data grid
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                columns = GridCells.Fixed(1)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly, // Adjusts spacing between items
-                    modifier = Modifier.fillMaxWidth()
-                )  {
-
-                var speed by remember { mutableStateOf(0f) }
-                val currentSpeed by animateFloatAsState(
-                    targetValue = speed,
-                    animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
-                )
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f) // Makes sure this takes up equal space
-                    ) {
-                        Text(
-                            text = "Average Speed",
-                            fontSize = 12.sp,
-                            color = Color.White
-                        )
-                        PointerSpeedometer(
-                            modifier = Modifier.size(150.dp),
-                            speed = currentSpeed,
-                            backgroundCircleColor = Color(80, 0, 0),
-                            barColor = Color(255, 255, 255),
-                            maxSpeed = 75f,
-
-                            unit = "mph"
-                        )
-                        Button(
-                            onClick = {
-                                // Change speed to start the animation
-                                speed = Random.nextFloat() * 100
-                            },
-                        ) {
-                            Text("Random speed")
-                        }
-                    }
-
-                // temperature
-                var temperature by remember { mutableStateOf(0f) }
-                val currentTemperature by animateFloatAsState(
-                    targetValue = temperature,
-                    animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
-                )
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f) // Ensures equal space
-                    ) {
-                        Text(
-                            text = "Average Temperature",
-                            fontSize = 12.sp,
-                            color = Color.White
-                        )
-                        TubeSpeedometer(
-                            modifier = Modifier.size(120.dp),
-                            speed = currentTemperature,
-                            backgroundCircleColor = Color(80, 0, 0),
-                            unit = "°F"
-                        )
-                        Button(
-                            onClick = {
-                                // Change speed to start the animation
-                                temperature = Random.nextFloat() * 120 - 10
-                            },
-                            modifier = Modifier
-                                .padding(4.dp) // Reduce padding
-                                .size(120.dp, 40.dp) // Adjust size (width x height)
-                        ) {
-                            Text("Update temp")
-                        }
-                    }
-                    }
-            }
-
-        } else if (name == "Motor") {
-                var temperature by remember { mutableStateOf(0f) }
-                val currentTemperature by animateFloatAsState(
-                    targetValue = temperature,
-                    animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
-                )
-                Text(
-                    text = "Average Temperature",
-                    fontSize = 12.sp,
-                    color = Color.White
-                )
-                TubeSpeedometer(
-                    modifier = Modifier.size(120.dp),
-                    speed = currentTemperature,
-                    unit = "°F"
-                )
-                Button(
-                    onClick = {
-                        // Change speed to start the animation
-                        temperature = Random.nextFloat() * 120 - 10
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(4.dp) // Reduce padding
-                        .size(120.dp, 40.dp) // Adjust size (width x height)
-                ) {
-                    Text("Update temp")
-                }
-            Text(
-                text = "Current and Power",
-                fontSize = 12.sp,
-                color = Color.White
-            )
-        } else {
-            data.forEach { metric: String ->
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 4.dp)
-                ) {
-                    if (metric.contains("Voltage")) {
-                        val image = painterResource(id = R.drawable.voltage_image)
-                        Image(
-                            painter = image,
-                            contentDescription = "Voltage Icon",
-                            modifier = Modifier
-                                .size(20.dp)
-                                .padding(end = 8.dp)
-                        )
-                    }
-                    Text(
-                        text = metric,
-                        fontSize = 12.sp,
-                        color = Color.White
+                items(info.entries.size) { index ->
+                    val entry = info.entries.elementAt(index)
+                    PointerSpeedometer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        name = entry.key,
+                        data = entry.value
                     )
                 }
             }
@@ -279,37 +140,164 @@ fun LazyGridItemScope.PointerSpeedometer(name: String, data: List<String>, modif
     }
 }
 
-
-
 @Composable
-fun DataGrid(
-    modifier : Modifier = Modifier,
-    data : Map<String, List<String>>
-) {
-    // columns = GridCells.Adaptive(dp size of each cell) or GridCells.Fixed(fixed number of cells)
-    LazyVerticalGrid(
-        modifier = modifier,
-        columns = GridCells.Fixed(1),
+fun PointerSpeedometer(name: String, data: List<String>, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
     ) {
-        items(data.entries.size) { d ->
-            val entry = data.entries.elementAt(d)
-            PointerSpeedometer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                name = entry.key,
-                data = entry.value
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = name,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         }
-    }
-}
 
+        // Handle specific rows
+        when (name) {
+            "Driver Info" -> {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    var speed by remember { mutableStateOf(0f) }
+                    val currentSpeed by animateFloatAsState(
+                        targetValue = speed,
+                        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+                    )
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyApplicationTheme {
+                    var temperature by remember { mutableStateOf(0f) }
+                    val currentTemperature by animateFloatAsState(
+                        targetValue = temperature,
+                        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+                    )
 
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                        Text(text = "Speed", fontSize = 12.sp, color = Color.White)
+                        PointerSpeedometer(
+                            modifier = Modifier.size(150.dp),
+                            speed = currentSpeed,
+                            backgroundCircleColor = Color(80, 0, 0),
+                            barColor = Color(255, 255, 255),
+                            maxSpeed = 75f,
+                            unit = "mph"
+                        )
+                        Button(onClick = { speed = Random.nextFloat() * 100 }) {
+                            Text("Random speed")
+                        }
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                        Text(text = "Temperature", fontSize = 12.sp, color = Color.White)
+                        TubeSpeedometer(
+                            modifier = Modifier.size(150.dp),
+                            speed = currentTemperature,
+                            backgroundCircleColor = Color(80, 0, 0),
+                            unit = "°F"
+                        )
+                        Button(onClick = { temperature = Random.nextFloat() * 120 - 10 }) {
+                            Text("Update Temperature")
+                        }
+                    }
+                }
+            }
+
+            "Main Battery", "Supplemental" -> {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val image = painterResource(id = R.drawable.voltage_image)
+                    Image(
+                        painter = image,
+                        contentDescription = "Voltage Icon",
+                        modifier = Modifier.size(25.dp).padding(end = 8.dp)
+                    )
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                        Text(text = "00.0V", fontSize = 20.sp, color = Color.White)
+                        Text(text = "000 mA", fontSize = 20.sp, color = Color.White)
+                    }
+                }
+            }
+
+            "Array 1", "Array 2", "Array 3" -> {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    data.forEach { metric ->
+                        Text(
+                            text = metric,
+                            fontSize = 12.sp,
+                            color = Color.White,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            "Motor" -> {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    var temperature by remember { mutableStateOf(0f) }
+                    val currentTemperature by animateFloatAsState(
+                        targetValue = temperature,
+                        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+                    )
+
+                    var current by remember { mutableStateOf(0f) }
+                    val currentCurrent by animateFloatAsState(
+                        targetValue = current,
+                        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+                    )
+
+                    var power by remember { mutableStateOf(0f) }
+                    val currentPower by animateFloatAsState(
+                        targetValue = power,
+                        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+                    )
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                        Text(text = "Temperature", fontSize = 12.sp, color = Color.White)
+                        TubeSpeedometer(
+                            modifier = Modifier.size(120.dp),
+                            speed = currentTemperature,
+                            backgroundCircleColor = Color(80, 0, 0),
+                            unit = "°F"
+                        )
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                        Text(text = "Current", fontSize = 12.sp, color = Color.White)
+                        TubeSpeedometer(
+                            modifier = Modifier.size(120.dp),
+                            speed = currentCurrent,
+                            backgroundCircleColor = Color(80, 0, 0),
+                            unit = "A"
+                        )
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                        Text(text = "Power", fontSize = 12.sp, color = Color.White)
+                        TubeSpeedometer(
+                            modifier = Modifier.size(120.dp),
+                            speed = currentPower,
+                            backgroundCircleColor = Color(80, 0, 0),
+                            unit = "W"
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -328,57 +316,6 @@ fun GreetingImage(modifier: Modifier = Modifier) {
                 .align(Alignment.CenterVertically)
                 .padding(10.dp),
             color = Color.White,
-            fontSize = 25.sp
-        )
-    }
-}
-
-
-
-@Composable
-fun DataGrid(
-    modifier : Modifier = Modifier,
-    data : Map<String, List<String>>
-) {
-    // columns = GridCells.Adaptive(dp size of each cell) or GridCells.Fixed(fixed number of cells)
-    LazyVerticalGrid(
-        modifier = modifier,
-        columns = GridCells.Fixed(3),
-    ) {
-        items(data.entries.size) { d ->
-            val entry = data.entries.elementAt(d)
-            PointerSpeedometer(
-                modifier = Modifier.aspectRatio(1f),
-                name = entry.key,
-                data = entry.value
-            )
-        }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyApplicationTheme {
-
-    }
-}
-
-@Composable
-fun GreetingImage(modifier: Modifier = Modifier) {
-    val image = painterResource(R.drawable.official_small)
-    Row(modifier) {
-        Image(
-            painter = image,
-            contentDescription = null,
-            modifier = Modifier.size(100.dp)
-        )
-        Text(
-            text = "TAMU Solar Car Racing",
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(10.dp),
             fontSize = 25.sp
         )
     }
