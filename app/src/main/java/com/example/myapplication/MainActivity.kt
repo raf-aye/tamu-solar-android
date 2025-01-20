@@ -4,6 +4,7 @@ package com.example.myapplication
 
 /*
 TO DO:
+        -- HOW TO TAKE IN DATA INPUT
         -- need battery gauges
         -- temps are still black, problem with library
         -- design UI on ipad
